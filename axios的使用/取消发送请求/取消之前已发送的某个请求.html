@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+  <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script>
+</head>
+<body>
+    <button>发送请求1</button>
+    <button>发送请求2</button>
+    <button>取消发送请求</button>
+</body>
+<script>
+    let cancel // 用于保存取消请求的函数
+    const btn = document.querySelectorAll('button');
+    axios.defaults.baseURL ='http://localhost:3000/posts';
+    btn[0].onclick= function getProducts1() {
+  // 在准备发请求前，取消未完成的请求
+  if (typeof cancel === 'function'){
+    cancel('取消请求')
+  }
+  axios({
+    url: '/1',
+    cancelToken: new axios.CancelToken(function executor(c){ // executor 函数接收一个 cancel 函数作为参数
+      // 保存取消函数，用于之后可能需要取消当前请求
+      cancel = c;
+    })
+  }).then(
+    response => {
+ 
+      cancel = null
+      console.log('请求1成功了', response.data)
+    },
+    error => {
+      if (axios.isCancel(error)){
+        console.log('请求1取消的错误', error.message)
+      }else{ // 请求出错了
+        cancel = null
+        console.log('请求1失败了', error.message, error) // 请求1失败了 强制取消请求 Cancel {message: "强制取消请求"}
+      }
+    }
+  )
+
+}
+
+btn[1].onclick=function getProducts2() {
+// 在准备发请求前，取消未完成的请求
+  if (typeof cancel === 'function'){
+    cancel('取消请求')// 取消请求
+  }
+  axios({
+      url: '/2',
+      cancelToken: new axios.CancelToken(function executor(c){ 
+      cancel = c;
+    })
+  }).then(
+    response => {
+      cancel = null
+      console.log('请求2成功了', response.data)
+    },
+    error => {
+      if (axios.isCancel(error)){
+        console.log('请求2取消的错误', error.message)
+      }else{ 
+        cancel = null
+        console.log('请求2失败了', error.message, error) 
+      }
+    }
+  )
+}
+btn[2].onclick=function cancelReq() {
+  // alert('取消请求')
+  // 执行取消请求的函数
+  if (typeof cancel === 'function'){
+    cancel('强制取消请求')
+  } else {
+    console.log('没有可取消的请求')
+  }
+}
+
+</script>
+
+</html>
