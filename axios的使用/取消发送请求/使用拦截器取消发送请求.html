@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script>
+</head>
+<body>
+    <button>发送请求1</button>
+    <button>发送请求2</button>
+    <button>取消发送请求</button>
+</body>
+<script>
+    axios.defaults.baseURL='http://localhost:3000/posts'
+    const btn = document.querySelectorAll('button');
+    let cancel = null // 用于保存取消请求的函数,将cancel初始值设置为null，每发送请求时将返回的c函数返给cancel，在then中响应请求时再将cancel值为空，每次判断cancel类型.来防止多次请求和取消请求。
+    // 添加请求拦截器
+    axios.interceptors.request.use((config) => { // 只写一个成功的回调
+  // 在准备发请求前，取消未完成的请求
+  if (typeof cancel === 'function'){
+    cancel('取消请求')
+  }
+  // 添加一个cancelToken的配置
+  config.cancelToken = new axios.CancelToken(function executor(c){ //在源码中 c是用于取消当前请求的函数，其状态值的改变影响着取消发送请求的执行
+      // 保存取消函数，用于之后可能需要取消当前请求
+      cancel = c;
+    })
+    return config
+})
+
+// 添加响应拦截器
+axios.interceptors.response.use(
+  response => { // 成功的回调
+    cancel = null 
+    return response
+  },
+  error => { // 失败的回调
+    if (axios.isCancel(error)){ // 请求取消的错误
+        console.log('请求取消的错误', error.message)
+        // 中断promise链
+        return new Promise(() => {})
+    }else{ // 请求出错了
+      cancel = null 
+      // 将错误向下传递 
+      // throw error
+      return Promise.reject(error)
+    }
+  }
+)
+
+
+btn[0].onclick =function getProducts1() {
+  axios({
+    url: '/1'
+  }).then(
+    response => {
+      console.log('请求1成功了', response.data)
+    },
+    error => { // 只用处理请求失败的情况，取消请求的错误不用处理
+      console.log('请求1失败了', error.message, error) 
+    }
+  )
+}
+
+btn[1].onclick =function getProducts2() {
+  axios({
+      url: '/2'
+  }).then(
+    response => {
+      console.log('请求2成功了', response.data)
+    },
+    error => {
+      console.log('请求2失败了', error.message, error) 
+    }
+  )
+}
+btn[2].onclick =function cancelReq() {
+  if (typeof cancel === 'function'){
+    cancel('强制取消请求')
+  } else {
+    console.log('没有可取消的请求')
+  }
+}
+
+</script>
+</html>
