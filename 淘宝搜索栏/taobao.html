@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+    <!-- 导入页面的基本样式 -->
+    <link rel="stylesheet" href="search.css" />
+    <!-- 导入 jQuery -->
+    <script src="taobao.js/jquery.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Logo -->
+      <img src="image/taobao_logo.png" alt="" class="logo" />
+
+      <div class="box">
+        <!-- tab 栏 -->
+        <div class="tabs">
+          <div class="tab-active">宝贝</div>
+          <div>店铺</div>
+        </div>
+        <!-- 搜索区域（搜索框和搜索按钮） -->
+        <div class="search-box">
+          <input type="text"  id='ipt' class="ipt" placeholder="请输入要搜索的内容" /><button class="btnSearch">
+            搜索
+          </button>
+        </div>
+        <div id="suggest-list" ></div>
+
+      </div>
+    </div>
+  </body>
+  <script>
+  $(function(){
+     
+    var timer = null;
+    var caches ={};
+    //定义防抖的函数(为用户输入设置定时器防止多次请求)
+    function debounceSearch(kw){
+      timer =setTimeout(() => {
+         getSuggestList(kw);
+      }, 500);
+    }
+
+    $('#ipt').on('keyup',function(){
+    let keywords =  $(this).val().trim()
+      if(keywords.length <= 0 ){
+      return $('#suggest-list').empty().hide();
+   }
+   console.log(keywords);
+ //判断是否有缓存中有数据
+   if(caches[keywords]){
+    return renderSuggestList(caches[keywords]);
+   }
+    debounceSearch(keywords);//若无数据,在防抖函数中发送新的请求
+  //  getSuggestList(keywords);
+  })
+//发送请求
+  function getSuggestList(kw){
+      $.ajax({
+        url:'https://suggest.taobao.com/sug?q=' + kw,
+        dataType:'jsonp',
+        success: function(res){
+          console.log(res);
+          renderSuggestList(res);
+        }
+      })
+  }
+
+
+  //渲染结构
+    function renderSuggestList(res){
+      
+/*     $('#ipt').on('keyup',function(){
+    let keywords =  $(this).val().trim()
+      if(keywords.length <= 0 ){
+      return $('suggest-list').empty().hide();
+   }
+ */
+  var htmlStr='';
+    if(res.result.length<=0){
+      return $('#suggest-List').empty().hide();
+    }
+ /*    for(let i=1;i<res.result.length;i++){
+       htmlStr += `<div class='suggest-item'>${res.result[i][0]}</div>`;
+    }
+    console.log(htmlStr);
+    $('#suggest-list').html(htmlStr).show();  */
+   $(res.result).each(function(index,domelm){
+      htmlStr  +=`<div class ='suggest-item'>${domelm[0]}</div>` ;
+    })
+    console.log(htmlStr);
+    $('#suggest-list').html(htmlStr).show();
+     let k = $('#ipt').val().trim();//将输入的值作为键，进行缓存
+     caches[k]  = res;
+  }
+}) 
+</script>
+</html>

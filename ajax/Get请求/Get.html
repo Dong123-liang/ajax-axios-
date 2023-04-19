@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get请求</title>
+</head>
+<style>
+    .box{
+        width: 300px;
+        height: 300px;
+        border:1px solid black;
+    }
+</style>
+<body>
+    <button>发送请求</button>
+    <div class="box"></div>
+</body>
+<script>
+    addEventListener('load',function(){
+ const btn=document.querySelector('button');
+ const box = document.querySelector('.box');
+ btn.addEventListener('click',function(){
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET','http://127.0.0.1:8000/get?a=1&b=2&c=3');
+    xhr.send();
+    xhr.onreadystatechange = function(){
+        if(xhr.readyState ===4){
+            if(xhr.status >= 200&&xhr.status <300){
+                console.log(xhr.status);//状态码
+                console.log(xhr.statusText);//状态字符串
+                console.log(xhr.getAllResponseHeaders());//所有响应头
+                console.log(xhr.response);//响应体
+             box.innerHTML = xhr.response;
+            }
+        }
+    }
+ })
+ })
+</script>
+</html>

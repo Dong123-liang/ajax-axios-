@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+        <!--[if lt IE 9]>
+      <script src="https://cdn.jsdelivr.cn/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+      <script src="https://cdn.jsdelivr.cn/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+    <![endif]-->
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+    <script src="jQuery.min.js"></script>
+</head>
+
+<body style="padding:15px">
+   <!--  图书馆表头 -->
+    <div class="panel panel-primary">
+          <div class="panel-heading">
+                <h3 class="panel-title">添加新图书</h3>
+          </div>
+          <div class="panel-body form-inline">
+                
+                
+                <div class="input-group">
+                    <div class="input-group-addon">书名</div>
+                    <input type="text" class="form-control" id="booksname" placeholder="请输入书名">
+                </div>
+                <div class="input-group">
+                    <div class="input-group-addon">作者</div>
+                    <input type="text" class="form-control" id="author" placeholder="请输入作者">
+                </div>
+                <div class="input-group">
+                    <div class="input-group-addon">出版社</div>
+                    <input type="text" class="form-control" id="publisher" placeholder="请输入出版社">
+                </div>
+                <button id="btnAdd" class="btn btn-primary">添加</button>
+          </div>
+    </div>
+   <!--  图书的表格 -->
+
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>书名</th>
+            <th>作者</th>
+            <th>出版社</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody id="libraryBody">
+<!--         <tr>
+            <td>1</td>
+            <td>西游记</td>
+            <td>吴承恩</td>
+            <td>北京图书出版社</td>
+            <td>删除</td>
+        </tr>
+        </tr> -->
+    </tbody>
+</table>
+</body>
+<script>
+    $(function(){
+        function getBookList(){
+            $.get('http://www.liulongbin.top:3006/api/getbooks',function(res){
+                console.log(res);
+                    if(res.status!==200){
+                        return alert('出错啦!');
+                    }
+                    let rows=[];
+                    $.each(res.data,function(i,item){
+                        rows.push(`<tr><td>${item.id}</td><td>${item.bookname}</td><td>${item.author}</td><td>${item.publisher}</td><td><a href="javascript:;" class='del' data-list="${item.id}">${'删除'}</a></td></tr>`)
+                    })
+                    $('#libraryBody').empty().append(rows.join(''));
+                
+            })
+        }
+        getBookList();  
+
+     $('#libraryBody').delegate('.del','click',function(){  //使用事件委托jQuery事件delegate()实现事件委托。格式:$(selector).delegate(childSelector, event, data, function)
+        // console.log('hello');
+        // console.log($(this).index('.del'));//获取每次点击删除键的索引值
+      console.log($(this).attr('data-list'));
+        let index =$(this).attr('data-list');
+        $.get('http://www.liulongbin.top:3006/api/delbook',{id:index},function (res){
+            console.log(res.status);
+            if(res.status !== 200){
+              return alert('删除失败');
+            }
+            getBookList();
+        }) 
+    }) 
+    $('#btnAdd').click(function(){
+        let bookname = $('#booksname').val().trim();
+        let author = $('#author').val().trim();
+        let publisher = $('#publisher').val().trim();
+        if(bookname.length<=0||author.length<=0||publisher.length<=0){
+            return alert('请输入完整图书的信息!');
+        }
+        $.post('http://www.liulongbin.top:3006/api/addbook',{bookname:bookname,author:author,publisher:publisher},function (res) {
+            if(res.status !==201){return alert('添加图书失败!')}
+            getBookList();
+            $('#booksname').val('');
+            $('#author').val('');
+            $('#publisher').val('');
+        })
+    })
+
+})
+</script>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>服务端响应JSON数据</title>
+  </head>
+  <style>
+    .box {
+      width: 300px;
+      height: 300px;
+      border: 1px solid black;
+    }
+  </style>
+  <body>
+    <button>发送请求</button>
+    <div class="box"></div>
+  </body>
+  <script>
+    addEventListener("load", function () {
+      const btn = document.querySelector("button");
+      const box = document.querySelector(".box");
+      btn.addEventListener("click", function () {
+        const xhr = new XMLHttpRequest();
+        xhr.responseType = "json"; //自动转换,将服务器中返回的json字符串,转为js
+        xhr.open("GET", "http://127.0.0.1:8000/JSON");
+        xhr.send();
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState === 4) {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              //
+              // console.log(xhr.response);
+              // result.innerHTML = xhr.response;
+              // 1. 手动对数据转化
+              // let data = JSON.parse(xhr.response);
+              // console.log(data);
+              // result.innerHTML = data.name;
+              // 2. 自动转换
+              console.log(xhr.response);
+              box.innerHTML = xhr.response.name;
+            }
+          }
+        };
+      });
+    });
+  </script>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>聊天机器人</title>
+    <link rel="stylesheet" href="css/main.css">
+    <script src="JS/jQuery.min.js"></script>
+    <script type="text/javascript" src="js/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="js/jquery.mousewheel.js"></script>
+    <script src="JS/scroll.js"></script>
+    <script src="JS/chatting robot .js"></script>
+</head>
+<body>
+    <div class="wrap">
+        <div class="header">
+            <h3>你好我是小爱同学</h3>
+            <img src="image/logoblank.f3920032.png" alt="">
+        </div>
+     <!--  聊天区域 -->
+     <div class="main">
+        <ul class="talk_list"  id="talk_list">
+            <li class="left_word">
+              <img src="image/person01.png" /> <span>Hello,你好啊！我是小爱同学</span>
+            </li>
+<!--                 <li class="right_word">
+                <img src="image/person02.png" /> <span>你好哦</span>
+              </li>  -->
+          </ul>
+
+          <div class="drag_bar" style="display:block;">
+            <div class="drager ui-draggable ui-draggable-handle" style="display: block; height: 412.628px;"></div>
+          </div>
+     </div>
+     <!-- 底部 消息编辑区域 -->
+    <div class="footer">
+        <img src="image/person02.png" alt="icon" />
+        <input type="text" placeholder="说的什么吧..." class="input_txt" id="ipt" />
+        <input type="button" value="发 送" class="input_sub" id="btnSend" />
+    </div>
+    </div>
+    <audio src="" id="voice" autoplay style="display:none;"></audio>
+</body>
+</html>
